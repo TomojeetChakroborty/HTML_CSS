@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... (Your existing head content) ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Settlement Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #aec9d6;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #131313;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #000000;
+            color: #fff;
+        }
+        tr:nth-child(odd) {
+            background-color: #c8ad7e;
+        }
+
+        tr:nth-child(even) {
+            background-color: #eff291;
+        }
+
+
+        tr:hover {
+            background-color: #498a60;
+        }
+
+        input {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Settlement Calculator</h1>
+    </header>
+    <div class="container">
+        <h2>Enter number of Transactions</h2>
+        <form id="tableForm">
+            <label for="rowCount">Enter here</label>
+            <input type="number" id="rowCount" name="rowCount" required>
+            <br>
+            <br>
+            <input type="submit" value="Create Table">
+        </form>
+        
+        <h2>SETTLE</h2>
+        <div id="tableContainer">
+            <!-- Table will be inserted here -->
+        </div>
+
+        <!-- Add a Calculate button -->
+        <button id="calculateButton">            Calculate                </button>
+
+        <h2>Settlement Results</h2>
+        <div id="settlementResults">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        var x = ["Samrat", "Sayan", "Tomojeet"];
+        const tableForm = document.getElementById('tableForm');
+        const tableContainer = document.getElementById('tableContainer');
+        const settlementResults = document.getElementById('settlementResults');
+        const calculateButton = document.getElementById('calculateButton');
+
+        tableForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const rowCount = parseInt(document.getElementById('rowCount').value);
+            const colCount = 3;
+
+            if (!isNaN(rowCount) && !isNaN(colCount) && rowCount > 0 && colCount > 0) {
+                const table = document.createElement('table');
+
+                // Create header row
+                const headerRow = document.createElement('tr');
+                for (let i = 0; i < colCount; i++) {
+                    const th = document.createElement('th');
+                    th.textContent = x[i];
+                    headerRow.appendChild(th);
+                }
+                table.appendChild(headerRow);
+
+                // Create data rows
+                for (let i = 1; i <= rowCount; i++) {
+                    const row = document.createElement('tr');
+                    for (let j = 1; j <= colCount; j++) {
+                        const td = document.createElement('td');
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.id = `cell_${i}_${j}`;
+                        input.setAttribute('placeholder', `Row ${i}, ${x[j - 1]}`);
+                        td.appendChild(input);
+                        row.appendChild(td);
+                    }
+                    table.appendChild(row);
+                }
+
+                // Replace any existing table in the container
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(table);
+            }
+        });
+
+        // Calculate the settlement logic when the Calculate button is clicked
+        calculateButton.addEventListener('click', function () {
+            // Retrieve the values from input fields and calculate settlement here
+            const rowCount = parseInt(document.getElementById('rowCount').value);
+            const colCount = 3;
+
+            const expenses = [];
+            for (let i = 0; i < colCount; i++) {
+                expenses.push([]);
+                for (let j = 1; j <= rowCount; j++) {
+                    const input = document.getElementById(`cell_${j}_${i + 1}`);
+                    expenses[i].push(parseFloat(input.value || 0));
+                }
+            }
+
+            // Calculate the total expenses for each person
+            const totalExpenses = expenses.map(column => column.reduce((acc, val) => acc + val, 0));
+
+            // Calculate individual share
+            const totalExpense = totalExpenses.reduce((acc, val) => acc + val, 0);
+            const individualShare = totalExpense / colCount;
+
+            // Calculate the settlement for each person
+            const settlementAmounts = [];
+            for (let i = 0; i < colCount; i++) {
+                settlementAmounts.push(individualShare - totalExpenses[i]);
+            }
+
+            // Display the settlement results
+            const resultsHTML = `<ul>${x.map((name, index) => `<li>${name}: ${settlementAmounts[index].toFixed(2)}</li>`).join('')}</ul>`;
+            settlementResults.innerHTML = `<h3>Settlement Results:</h3>${resultsHTML}`;
+        });
+    </script>
+</body>
+</html>
